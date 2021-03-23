@@ -1,0 +1,22 @@
+.board {
+    outline: 2px solid burlywood;
+}
+
+.row {
+    height: 50px;
+}
+
+.cell {
+    width: 50px;
+    height: 50px;
+    outline: 1px solid burlywood;
+    display: inline-block;
+}
+
+.snake-cell {
+    background-color: rgb(36, 139, 36);
+}
+
+.food-cell {
+    background-color: red;
+}
