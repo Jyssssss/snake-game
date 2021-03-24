@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
-    // randomIntFromInterval,
     useInterval,
 } from '../lib/utils.js';
 
 import './Board.css';
 import LinkedList from '../lib/LinkedList';
 
-const BOARD_SIZE = 10;
+const BOARD_SIZE = 15;
+const SNAKE_SPEED = 100;
+const INITIAL_FOOD_DISTANCE = 5
 
 const Direction = {
     UP: 'UP',
@@ -36,15 +37,23 @@ const Board = () => {
     const [snakeCells, setSnakeCells] = useState(new Set([snake.head.value.cell]));
     const [direction, setDirection] = useState(Direction.RIGHT);
     const [hasBoundary, setHasBoundary] = useState(false);
-    const [foodCell, setFoodCell] = useState(snake.head.value.cell + 5);
+    const [foodCell, setFoodCell] = useState(snake.head.value.cell + INITIAL_FOOD_DISTANCE);
+    const [score, setScore] = useState(0);
+    const [topScore, setTopScore] = useState(0);
 
     useEffect(() => {
         window.addEventListener('keydown', handleKeydown);
     });
 
+    useEffect(() => {
+        if (score > topScore) {
+            setTopScore(score);
+        }
+    }, [score, topScore])
+
     useInterval(() => {
         moveSnake();
-    }, 300);
+    }, SNAKE_SPEED);
 
     const handleKeydown = e => {
         const newDirection = getDirectionFromKey(e.key);
@@ -60,12 +69,12 @@ const Board = () => {
         };
 
         const nextHeadCoords = getNextCoords(curHeadCoords, direction, board, hasBoundary);
-        if (hasBoundary && isOutOfBounds(nextHeadCoords, board)) {
+        const nextHeadCell = board[nextHeadCoords.row][nextHeadCoords.col];
+
+        if ((hasBoundary && isOutOfBounds(nextHeadCoords, board)) || snakeCells.has(nextHeadCell)) {
             handleGameOver();
             return;
         }
-
-        const nextHeadCell = board[nextHeadCoords.row][nextHeadCoords.col];
 
         snake.addFirst({
             row: nextHeadCoords.row,
@@ -79,10 +88,22 @@ const Board = () => {
         if (nextHeadCell !== foodCell) {
             newSnakeCells.delete(snake.tail.value.cell);
             snake.removeLast();
+        } else {
+            handleFoodConsumtion(newSnakeCells);
         }
 
         setSnake(snake);
         setSnakeCells(newSnakeCells);
+    }
+
+    const handleFoodConsumtion = newSnakeCells => {
+        const maxCellValue = BOARD_SIZE * BOARD_SIZE;
+        let nextFoodCell = null;
+        while (nextFoodCell === null || newSnakeCells.has(nextFoodCell)) {
+            nextFoodCell = Math.floor(Math.random() * maxCellValue + 1);
+        }
+        setFoodCell(nextFoodCell);
+        setScore(s => s + 1);
     }
 
     const handleGameOver = () => {
@@ -90,6 +111,8 @@ const Board = () => {
         setSnake(new LinkedList(newSnake));
         setSnakeCells(new Set([newSnake.cell]));
         setDirection(Direction.RIGHT);
+        setFoodCell(newSnake.cell + INITIAL_FOOD_DISTANCE)
+        setScore(0);
     }
 
     return (
@@ -105,11 +128,19 @@ const Board = () => {
                 }</div>
             ))
         }
+            <div className="score-row">
+                <div className="score-cell">
+                    <span>Score: {score}</span>
+                </div>
+                <div className="score-cell">
+                    <span>Top Score: {topScore}</span>
+                </div>
+            </div>
         </div>
     );
 };
 
-const createBoard = (boardSize) => {
+const createBoard = boardSize => {
     let counter = 1;
     const board = [];
     for (let row = 0; row < boardSize; row++) {
