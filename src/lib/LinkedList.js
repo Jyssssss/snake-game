@@ -8,10 +8,17 @@ class LinkedList {
     }
 
     addFirst = (value) => {
+        const node = new LinkedListNode(value);
         const curHead = this.head;
-        this.head = value;
-        curHead.mext = value;
+        this.head = node;
+        curHead.next = node;
     };
+
+    removeLast = () => {
+        if (this.tail.next !== null) {
+            this.tail = this.tail.next;
+        }
+    }
 }
 
 export default LinkedList;

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
     // randomIntFromInterval,
-    // reverseLinkedList,
     useInterval,
 } from '../lib/utils.js';
 
 import './Board.css';
-import LinkedListNode from '../lib/LinkedListNode';
 import LinkedList from '../lib/LinkedList';
 
 const BOARD_SIZE = 10;
@@ -38,6 +36,7 @@ const Board = () => {
     const [snakeCells, setSnakeCells] = useState(new Set([snake.head.value.cell]));
     const [direction, setDirection] = useState(Direction.RIGHT);
     const [hasBoundary, setHasBoundary] = useState(false);
+    const [foodCell, setFoodCell] = useState(snake.head.value.cell + 5);
 
     useEffect(() => {
         window.addEventListener('keydown', handleKeydown);
@@ -68,18 +67,21 @@ const Board = () => {
 
         const nextHeadCell = board[nextHeadCoords.row][nextHeadCoords.col];
 
-        snake.addFirst(new LinkedListNode({
+        snake.addFirst({
             row: nextHeadCoords.row,
             col: nextHeadCoords.col,
             cell: nextHeadCell
-        }));
+        });
 
         const newSnakeCells = new Set(snakeCells);
-        newSnakeCells.delete(snake.tail.value.cell);
         newSnakeCells.add(nextHeadCell);
 
-        snake.tail = snake.tail.next !== null ? snake.tail.next : snake.head;
+        if (nextHeadCell !== foodCell) {
+            newSnakeCells.delete(snake.tail.value.cell);
+            snake.removeLast();
+        }
 
+        setSnake(snake);
         setSnakeCells(newSnakeCells);
     }
 
@@ -97,12 +99,13 @@ const Board = () => {
                     row.map((cellValue, cellIdx) => (
                         <div
                             key={cellIdx}
-                            className={`cell ${snakeCells.has(cellValue) ? 'snake-cell' : ''}`}>
+                            className={getCellClassName(cellValue, foodCell, snakeCells)}>
                         </div>
                     ))
                 }</div>
             ))
-        }</div>
+        }
+        </div>
     );
 };
 
@@ -119,13 +122,17 @@ const createBoard = (boardSize) => {
     return board
 }
 
-const getDirectionFromKey = key => {
-    if (key === 'ArrowUp') return Direction.UP;
-    if (key === 'ArrowRight') return Direction.RIGHT;
-    if (key === 'ArrowDown') return Direction.DOWN;
-    if (key === 'ArrowLeft') return Direction.LEFT;
-    return '';
-};
+const getDirectionFromKey = key =>
+    key === 'ArrowUp' ? Direction.UP :
+        key === 'ArrowRight' ? Direction.RIGHT :
+            key === 'ArrowDown' ? Direction.DOWN :
+                key === 'ArrowLeft' ? Direction.LEFT : '';
+
+const getOppositeDirection = direction =>
+    direction === Direction.UP ? Direction.DOWN :
+        direction === Direction.RIGHT ? Direction.LEFT :
+            direction === Direction.DOWN ? Direction.UP :
+                direction === Direction.LEFT ? Direction.RIGHT : '';
 
 const getNextCoords = (coords, direction, board, hasBoundary) => {
     const newCoords = direction === Direction.UP ? {
@@ -154,5 +161,8 @@ const isOutOfBounds = (coords, board) => {
     const { row, col } = coords;
     return row < 0 || col < 0 || row >= board.length || col >= board[0].length
 };
+
+const getCellClassName = (cellValue, foodCell, snakeCells) =>
+    snakeCells.has(cellValue) ? 'cell snake-cell' : cellValue === foodCell ? 'cell food-cell' : 'cell';
 
 export default Board;
