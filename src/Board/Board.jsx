@@ -40,10 +40,23 @@ const Board = () => {
     const [foodCell, setFoodCell] = useState(snake.head.value.cell + INITIAL_FOOD_DISTANCE);
     const [score, setScore] = useState(0);
     const [topScore, setTopScore] = useState(0);
+    const [speed, setSpeed] = useState(SNAKE_SPEED);
+    const [stop, setStop] = useState(false);
 
     useEffect(() => {
+        const handleKeydown = e => {
+            if (e.key === 'Enter') {
+                setStop(!stop);
+            } else if (!stop) {
+                const newDirection = getDirectionFromKey(e.key);
+                const isValidDirection = newDirection !== '';
+                if (!isValidDirection) return;
+                setDirection(newDirection);
+            }
+        };
         window.addEventListener('keydown', handleKeydown);
-    });
+        return () => window.removeEventListener('keydown', handleKeydown);
+    }, [stop]);
 
     useEffect(() => {
         if (score > topScore) {
@@ -53,14 +66,7 @@ const Board = () => {
 
     useInterval(() => {
         moveSnake();
-    }, SNAKE_SPEED);
-
-    const handleKeydown = e => {
-        const newDirection = getDirectionFromKey(e.key);
-        const isValidDirection = newDirection !== '';
-        if (!isValidDirection) return;
-        setDirection(newDirection);
-    };
+    }, !stop ? speed : null);
 
     const moveSnake = () => {
         const curHeadCoords = {
@@ -89,14 +95,14 @@ const Board = () => {
             newSnakeCells.delete(snake.tail.value.cell);
             snake.removeLast();
         } else {
-            handleFoodConsumtion(newSnakeCells);
+            handleFoodConsumption(newSnakeCells);
         }
 
         setSnake(snake);
         setSnakeCells(newSnakeCells);
     }
 
-    const handleFoodConsumtion = newSnakeCells => {
+    const handleFoodConsumption = newSnakeCells => {
         const maxCellValue = BOARD_SIZE * BOARD_SIZE;
         let nextFoodCell = null;
         while (nextFoodCell === null || newSnakeCells.has(nextFoodCell)) {
