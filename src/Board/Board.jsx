@@ -43,27 +43,37 @@ const Board = () => {
     const [speed, setSpeed] = useState(SNAKE_SPEED);
     const [stop, setStop] = useState(false);
 
+    // Handle keydown event.
     useEffect(() => {
         const handleKeydown = e => {
+            // Press Enter to pause or resume.
             if (e.key === 'Enter') {
                 setStop(!stop);
             } else if (!stop) {
                 const newDirection = getDirectionFromKey(e.key);
-                const isValidDirection = newDirection !== '';
-                if (!isValidDirection) return;
+                // Ignore the cases
+                // 1. input key not arrow directions,
+                // 2. or new direction is the opposite of the original one 
+                // when the snake's size is more than one.
+                if (newDirection === null ||
+                    (getOppositeDirection(newDirection) === direction && snakeCells.size > 1))
+                    return;
                 setDirection(newDirection);
             }
         };
+
         window.addEventListener('keydown', handleKeydown);
         return () => window.removeEventListener('keydown', handleKeydown);
-    }, [stop]);
+    }, [stop, direction, snakeCells.size]);
 
+    // Handle scores
     useEffect(() => {
         if (score > topScore) {
             setTopScore(score);
         }
     }, [score, topScore])
 
+    // Handle snake's move.
     useInterval(() => {
         moveSnake();
     }, !stop ? speed : null);
@@ -163,13 +173,13 @@ const getDirectionFromKey = key =>
     key === 'ArrowUp' ? Direction.UP :
         key === 'ArrowRight' ? Direction.RIGHT :
             key === 'ArrowDown' ? Direction.DOWN :
-                key === 'ArrowLeft' ? Direction.LEFT : '';
+                key === 'ArrowLeft' ? Direction.LEFT : null;
 
 const getOppositeDirection = direction =>
     direction === Direction.UP ? Direction.DOWN :
         direction === Direction.RIGHT ? Direction.LEFT :
             direction === Direction.DOWN ? Direction.UP :
-                direction === Direction.LEFT ? Direction.RIGHT : '';
+                direction === Direction.LEFT ? Direction.RIGHT : null;
 
 const getNextCoords = (coords, direction, board, hasBoundary) => {
     const newCoords = direction === Direction.UP ? {
