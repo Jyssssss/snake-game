@@ -4,7 +4,7 @@ import {
 } from '../lib/utils.js';
 
 import './Board.css';
-import LinkedList from '../lib/LinkedList';
+import Snake from './Snake';
 
 const BOARD_SIZE = 15;
 const SNAKE_SPEED = 100;
@@ -33,11 +33,11 @@ const getSnakeStartValue = board => {
 
 const Board = () => {
     const [board, setBoard] = useState(createBoard(BOARD_SIZE));
-    const [snake, setSnake] = useState(new LinkedList(getSnakeStartValue(board)));
-    const [snakeCells, setSnakeCells] = useState(new Set([snake.head.value.cell]));
+    const [snake, setSnake] = useState(new Snake(getSnakeStartValue(board)));
+    const [snakeCells, setSnakeCells] = useState(new Set([snake.getHead().value.cell]));
     const [direction, setDirection] = useState(Direction.RIGHT);
     const [hasBoundary, setHasBoundary] = useState(false);
-    const [foodCell, setFoodCell] = useState(snake.head.value.cell + INITIAL_FOOD_DISTANCE);
+    const [foodCell, setFoodCell] = useState(snake.getHead().value.cell + INITIAL_FOOD_DISTANCE);
     const [score, setScore] = useState(0);
     const [topScore, setTopScore] = useState(0);
     const [speed, setSpeed] = useState(SNAKE_SPEED);
@@ -80,8 +80,8 @@ const Board = () => {
 
     const moveSnake = () => {
         const curHeadCoords = {
-            row: snake.head.value.row,
-            col: snake.head.value.col
+            row: snake.getHead().value.row,
+            col: snake.getHead().value.col
         };
 
         const nextHeadCoords = getNextCoords(curHeadCoords, direction, board, hasBoundary);
@@ -92,7 +92,7 @@ const Board = () => {
             return;
         }
 
-        snake.addFirst({
+        snake.addHead({
             row: nextHeadCoords.row,
             col: nextHeadCoords.col,
             cell: nextHeadCell
@@ -102,8 +102,8 @@ const Board = () => {
         newSnakeCells.add(nextHeadCell);
 
         if (nextHeadCell !== foodCell) {
-            newSnakeCells.delete(snake.tail.value.cell);
-            snake.removeLast();
+            newSnakeCells.delete(snake.getTail().value.cell);
+            snake.removeTail();
         } else {
             handleFoodConsumption(newSnakeCells);
         }
@@ -124,7 +124,7 @@ const Board = () => {
 
     const handleGameOver = () => {
         const newSnake = getSnakeStartValue(board);
-        setSnake(new LinkedList(newSnake));
+        setSnake(new Snake(newSnake));
         setSnakeCells(new Set([newSnake.cell]));
         setDirection(Direction.RIGHT);
         setFoodCell(newSnake.cell + INITIAL_FOOD_DISTANCE)

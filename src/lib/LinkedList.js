@@ -11,14 +11,48 @@ class LinkedList {
         const node = new LinkedListNode(value);
         const curHead = this.head;
         this.head = node;
-        curHead.next = node;
+        node.next = curHead;
+        if (this.tail === null) {
+            this.tail = node;
+        }
     };
 
-    removeLast = () => {
-        if (this.tail.next !== null) {
-            this.tail = this.tail.next;
+    addLast = (value) => {
+        if (this.head === null) {
+            this.addFirst(value);
+        } else {
+            const node = new LinkedListNode(value);
+            const curTail = this.tail;
+            this.tail = node;
+            curTail.next = node;
+        }
+    };
+
+    removeFirst = () => {
+        if (this.head !== null) {
+            this.head = this.head.next;
+            if (this.head === null) {
+                this.tail = null;
+            }
         }
     }
+
+    removeLast = () => {
+        if (this.head !== null) {
+            let node = this.head;
+            if (node.next == null) {
+                this.head = null;
+                this.tail = null;
+            }
+            else {
+                while (node.next !== null && node.next.next !== null) {
+                    node = node.next;
+                }
+                node.next = null;
+                this.tail = node;
+            }
+        }
+    };
 }
 
 export default LinkedList;
