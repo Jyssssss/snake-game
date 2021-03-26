@@ -6,8 +6,7 @@ import {
 import './Board.css';
 import Snake from './Snake';
 
-const BOARD_SIZE = 15;
-const SNAKE_SPEED = 100;
+const SNAKE_MIN_SPEED = 1000;
 const INITIAL_FOOD_DISTANCE = 5
 
 const Direction = {
@@ -31,17 +30,16 @@ const getSnakeStartValue = board => {
     };
 };
 
-const Board = () => {
-    const [board, setBoard] = useState(createBoard(BOARD_SIZE));
+const Board = (props) => {
+    const board = createBoard(props.boardSize);
     const [snake, setSnake] = useState(new Snake(getSnakeStartValue(board)));
     const [snakeCells, setSnakeCells] = useState(new Set([snake.getHead().value.cell]));
     const [direction, setDirection] = useState(Direction.RIGHT);
-    const [hasBoundary, setHasBoundary] = useState(false);
     const [foodCell, setFoodCell] = useState(snake.getHead().value.cell + INITIAL_FOOD_DISTANCE);
     const [score, setScore] = useState(0);
-    const [topScore, setTopScore] = useState(0);
-    const [speed, setSpeed] = useState(SNAKE_SPEED);
     const [stop, setStop] = useState(false);
+    const speed = Math.max(SNAKE_MIN_SPEED - (props.speed - 1) * 50, 10);
+    const hasBoundary = false;
 
     // Handle keydown event.
     useEffect(() => {
@@ -49,6 +47,8 @@ const Board = () => {
             // Press Enter to pause or resume.
             if (e.key === 'Enter') {
                 setStop(!stop);
+            } else if (e.key === 'Escape') {
+                props.viewHandler();
             } else if (!stop) {
                 const newDirection = getDirectionFromKey(e.key);
                 // Ignore the cases
@@ -64,14 +64,12 @@ const Board = () => {
 
         window.addEventListener('keydown', handleKeydown);
         return () => window.removeEventListener('keydown', handleKeydown);
-    }, [stop, direction, snakeCells.size]);
+    }, [stop, direction, snakeCells.size, props]);
 
     // Handle scores
     useEffect(() => {
-        if (score > topScore) {
-            setTopScore(score);
-        }
-    }, [score, topScore])
+        if (score > props.topScore) props.topScoreHandler(score);
+    }, [score, props]);
 
     // Handle snake's move.
     useInterval(() => {
@@ -113,7 +111,7 @@ const Board = () => {
     }
 
     const handleFoodConsumption = newSnakeCells => {
-        const maxCellValue = BOARD_SIZE * BOARD_SIZE;
+        const maxCellValue = props.boardSize ** 2;
         let nextFoodCell = null;
         while (nextFoodCell === null || newSnakeCells.has(nextFoodCell)) {
             nextFoodCell = Math.floor(Math.random() * maxCellValue + 1);
@@ -149,7 +147,7 @@ const Board = () => {
                     <span>Score: {score}</span>
                 </div>
                 <div className="score-cell">
-                    <span>Top Score: {topScore}</span>
+                    <span>Top Score: {props.topScore}</span>
                 </div>
             </div>
         </div>
@@ -202,7 +200,7 @@ const getNextCoords = (coords, direction, board, hasBoundary) => {
         row: newCoords.row < 0 ? board.length - 1 : newCoords.row >= board.length ? 0 : newCoords.row,
         col: newCoords.col < 0 ? board[0].length - 1 : newCoords.col >= board[0].length ? 0 : newCoords.col
     };
-}
+};
 
 const isOutOfBounds = (coords, board) => {
     const { row, col } = coords;
