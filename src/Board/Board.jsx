@@ -38,8 +38,8 @@ const Board = (props) => {
     const [foodCell, setFoodCell] = useState(snake.getHead().value.cell + INITIAL_FOOD_DISTANCE);
     const [score, setScore] = useState(0);
     const [stop, setStop] = useState(false);
-    const speed = Math.max(SNAKE_MIN_SPEED - (props.speed - 1) * 50, 10);
-    const hasBoundary = false;
+    const [speed, setSpeed] = useState(Math.max(SNAKE_MIN_SPEED - (props.speed - 1) * 50, 10));
+    const [hasBoundary, setHasBoundary] = useState(props.hasWall);
 
     // Handle keydown event.
     useEffect(() => {
@@ -83,12 +83,13 @@ const Board = (props) => {
         };
 
         const nextHeadCoords = getNextCoords(curHeadCoords, direction, board, hasBoundary);
-        const nextHeadCell = board[nextHeadCoords.row][nextHeadCoords.col];
 
-        if ((hasBoundary && isOutOfBounds(nextHeadCoords, board)) || snakeCells.has(nextHeadCell)) {
+        if ((hasBoundary && isOutOfBounds(nextHeadCoords, board)) ||
+            snakeCells.has(board[nextHeadCoords.row][nextHeadCoords.col])) {
             handleGameOver();
             return;
         }
+        const nextHeadCell = board[nextHeadCoords.row][nextHeadCoords.col];
 
         snake.addHead({
             row: nextHeadCoords.row,

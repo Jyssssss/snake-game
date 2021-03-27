@@ -6,3 +6,51 @@
     padding: 5%;
     text-align: center;
 }
+
+.item {
+    width: 70%;
+    font-family: Gill Sans, sans-serif;
+    color: #efefef;
+    display: inline-block;
+    vertical-align: middle;
+    width: 50%;
+    border: 1px solid #efefef;
+    border-style: ridge;
+    padding: 1%;
+    margin: 1%;
+}
+
+.selected-item {
+    background-color: rgb(140, 140, 187);
+    color: rgb(33, 212, 212);
+}
+
+.value-item {
+    text-align: center;
+}
+
+.value-item-cell {
+    display: inline-block;
+    vertical-align: middle;
+    width: 50%;
+}
+
+.arrow-right {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid rgb(27, 165, 165);
+    margin-left: 5%;
+}
+
+.arrow-left {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid rgb(27, 165, 165);
+    margin-right: 5%;
+}
