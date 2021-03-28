@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     useInterval,
 } from '../lib/utils.js';
 
 import './Board.css';
 import Snake from './Snake';
+import Modal from '../Modal/Modal';
 
 const SNAKE_MIN_SPEED = 1000;
 const INITIAL_FOOD_DISTANCE = 5
@@ -38,8 +39,19 @@ const Board = (props) => {
     const [foodCell, setFoodCell] = useState(snake.getHead().value.cell + INITIAL_FOOD_DISTANCE);
     const [score, setScore] = useState(0);
     const [stop, setStop] = useState(false);
-    const [speed, setSpeed] = useState(Math.max(SNAKE_MIN_SPEED - (props.speed - 1) * 50, 10));
-    const [hasBoundary, setHasBoundary] = useState(props.hasWall);
+    const [speed,] = useState(Math.max(SNAKE_MIN_SPEED - (props.speed - 1) * 50, 10));
+    const [hasBoundary,] = useState(props.hasWall);
+    const [isPauseOpen, setIsPauseOpen] = useState(false);
+    const [isEnd, setIsEnd] = useState(false);
+
+    const handleRestart = useCallback(() => {
+        const newSnake = getSnakeStartValue(board);
+        setSnake(new Snake(newSnake));
+        setSnakeCells(new Set([newSnake.cell]));
+        setDirection(Direction.RIGHT);
+        setFoodCell(newSnake.cell + INITIAL_FOOD_DISTANCE)
+        setScore(0);
+    }, [board]);
 
     // Handle keydown event.
     useEffect(() => {
@@ -47,6 +59,8 @@ const Board = (props) => {
             // Press Enter to pause or resume.
             if (e.key === 'Enter') {
                 setStop(!stop);
+                if (isEnd) handleRestart();
+                setIsPauseOpen(!isPauseOpen);
             } else if (e.key === 'Escape') {
                 props.viewHandler();
             } else if (!stop) {
@@ -64,7 +78,7 @@ const Board = (props) => {
 
         window.addEventListener('keydown', handleKeydown);
         return () => window.removeEventListener('keydown', handleKeydown);
-    }, [stop, direction, snakeCells.size, props]);
+    }, [stop, direction, snakeCells.size, isPauseOpen, isEnd, handleRestart, props]);
 
     // Handle scores
     useEffect(() => {
@@ -109,7 +123,7 @@ const Board = (props) => {
 
         setSnake(snake);
         setSnakeCells(newSnakeCells);
-    }
+    };
 
     const handleFoodConsumption = newSnakeCells => {
         const maxCellValue = props.boardSize ** 2;
@@ -119,39 +133,47 @@ const Board = (props) => {
         }
         setFoodCell(nextFoodCell);
         setScore(s => s + 1);
-    }
+    };
 
     const handleGameOver = () => {
-        const newSnake = getSnakeStartValue(board);
-        setSnake(new Snake(newSnake));
-        setSnakeCells(new Set([newSnake.cell]));
-        setDirection(Direction.RIGHT);
-        setFoodCell(newSnake.cell + INITIAL_FOOD_DISTANCE)
-        setScore(0);
+        setStop(true);
+        setIsEnd(true);
+        setIsPauseOpen(true);
     }
 
     return (
-        <div className="board">{
-            board.map((row, rowIdx) => (
-                <div key={rowIdx} className="row">{
-                    row.map((cellValue, cellIdx) => (
-                        <div
-                            key={cellIdx}
-                            className={getCellClassName(cellValue, foodCell, snakeCells)}>
-                        </div>
-                    ))
-                }</div>
-            ))
-        }
-            <div className="score-row">
-                <div className="score-cell">
-                    <span>Score: {score}</span>
-                </div>
-                <div className="score-cell">
-                    <span>Top Score: {props.topScore}</span>
+        <>
+            <div className="board">{
+                board.map((row, rowIdx) => (
+                    <div key={rowIdx} className="row">{
+                        row.map((cellValue, cellIdx) => (
+                            <div
+                                key={cellIdx}
+                                className={getCellClassName(cellValue, foodCell, snakeCells)}>
+                            </div>
+                        ))
+                    }</div>
+                ))
+            }
+                <div className="score-row">
+                    <div className="score-cell">
+                        <span>Score: {score}</span>
+                    </div>
+                    <div className="score-cell">
+                        <span>Top Score: {props.topScore}</span>
+                    </div>
                 </div>
             </div>
-        </div>
+            <Modal isOpen={isPauseOpen}>
+                <div>
+                    <br></br>
+                    {isEnd && <h3>Your score: {score}</h3>}
+                    <h3>Press ENTER to resume.</h3>
+                    <h3>Press ESC to End.</h3>
+                    <br></br>
+                </div>
+            </Modal>
+        </>
     );
 };
 

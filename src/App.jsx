@@ -34,19 +34,19 @@ const App = () => {
   const [boardSizeIdx, setBoardSizeIdx] = useState(DEFAULT_BOARD_IDX);
   const [settingIdxs, setSettingIdx] = useState([mapIdx, speedIdx, boardSizeIdx]);
   const [topScore, setTopScore] = useState(0);
-  const [mapSetting, setMapSetting] = useState(
+  const [mapSetting,] = useState(
     new Setting(
       'Map',
       [{ text: 'Standard', value: Map.Standard }, { text: 'No Wall', value: Map.NoWall }],
       i => setMapIdx(i))
   );
-  const [speedSetting, setSpeedSetting] = useState(
+  const [speedSetting,] = useState(
     new Setting(
       'Speed',
       [...Array(MAX_SPEED).keys()].map(n => ({ text: n + 1, value: n + 1 })),
       i => setSpeedIdx(i))
   );
-  const [boardSizeSetting, setBoardSizeSetting] = useState(
+  const [boardSizeSetting,] = useState(
     new Setting(
       'Board Size',
       [...Array(4).keys()].map(n => ({ text: `${(n + 2) * 5} x ${(n + 2) * 5}`, value: (n + 2) * 5 })),
