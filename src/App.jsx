@@ -3,7 +3,7 @@ import Board from './Board/Board';
 import Menu from './Menu/Menu';
 import './App.css';
 
-const MAX_SPEED = 20;
+const MAX_SPEED = 21;
 const DEFAULT_MAP_IDX = 0;
 const DEFAULT_SPEED_IDX = 9;
 const DEFAULT_BOARD_IDX = 1;

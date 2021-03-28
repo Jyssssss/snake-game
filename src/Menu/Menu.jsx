@@ -77,7 +77,7 @@ const Menu = (props) => {
             <Modal isOpen={isHelpOpen}>
                 <div>
                     <br></br>
-                    <h3>1. Use Arrow Keys to move.</h3>
+                    <h3>1. Use Arrow Keys to Move.</h3>
                     <h3>2. Press ENTER to Pause.</h3>
                     <h3>3. Press ESC to End.</h3>
                     <br></br>
