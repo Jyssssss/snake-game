@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './Menu.css';
 
 const Item = (props) => {
-    const [curIdx, setCurIdx] = useState(props.current ?? 0);
+    const [curIdx,] = useState(props.current ?? 0);
 
     useEffect(() => {
         const handleKeydown = e => {
