@@ -4,6 +4,10 @@ import Item from './Item';
 
 import './Menu.css';
 
+const CONFIRM_KEY = 'Enter';
+const UP_KEY = 'ArrowUp';
+const DOWN_KEY = 'ArrowDown';
+
 const MenuType = {
     Main: 'MAIN',
     Settings: 'SETTINGS'
@@ -45,18 +49,19 @@ const Menu = (props) => {
     useEffect(() => {
         const handleKeydown = e => {
             const items = menuType === MenuType.Main ? mainItems : settingItems
-            if (e.key === 'Enter') {
+            if (e.key === CONFIRM_KEY) {
                 items[selected].action();
             } else if (!isHelpOpen) {
-                if (e.key === 'ArrowUp') {
+                if (e.key === UP_KEY) {
                     if (selected === 0) return;
                     setSelected(s => s - 1);
-                } else if (e.key === 'ArrowDown') {
+                } else if (e.key === DOWN_KEY) {
                     if (selected === items.length - 1) return;
                     setSelected(selected + 1);
                 }
             }
         };
+
         window.addEventListener('keydown', handleKeydown);
         return () => window.removeEventListener('keydown', handleKeydown);
     }, [selected, menuType, mainItems, settingItems, isHelpOpen]);

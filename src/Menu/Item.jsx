@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 
 import './Menu.css';
 
+const RIGHT_KEY = 'ArrowRight';
+const LEFT_KEY = 'ArrowLeft';
+
 const Item = (props) => {
     const [curIdx,] = useState(props.current ?? 0);
 
     useEffect(() => {
         const handleKeydown = e => {
             if (props.isSelected && props.values) {
-                if (e.key === 'ArrowLeft') {
+                if (e.key === LEFT_KEY) {
                     if (curIdx === 0) return;
                     props.action(curIdx - 1);
-                } else if (e.key === 'ArrowRight') {
+                } else if (e.key === RIGHT_KEY) {
                     if (curIdx === props.values.length - 1) return;
                     props.action(curIdx + 1);
                 }

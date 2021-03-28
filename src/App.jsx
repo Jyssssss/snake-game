@@ -68,7 +68,7 @@ const App = () => {
   const handleTopScore = (s) => { setTopScore(s); };
 
   return (
-    <div className="App">{
+    <div className='App'>{
       view === View.Home ?
         <Menu
           viewHandler={handleView}

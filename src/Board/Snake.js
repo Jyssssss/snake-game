@@ -1,13 +1,11 @@
-import LinkedList from "../lib/LinkedList";
+class Snake extends Array {
+    getHead = () => this.length > 0 ? this[this.length - 1] : null;
 
-class Snake extends LinkedList {
-    getHead = () => this.tail;
+    getTail = () => this.length > 0 ? this[0] : null;
 
-    getTail = () => this.head;
+    addHead = (value) => this.push(value);
 
-    addHead = (value) => this.addLast(value);
-
-    removeTail = () => this.removeFirst();
+    removeTail = () => this.shift();
 }
 
 export default Snake;
