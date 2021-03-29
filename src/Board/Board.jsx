@@ -231,7 +231,7 @@ const Board = (props) => {
                 <div>
                     <br></br>
                     {isEnd && <h3>Your score: {score}</h3>}
-                    <h3>Press ENTER to Resume.</h3>
+                    <h3>Press ENTER to {isEnd ? 'Restart' : 'Resume'}.</h3>
                     <h3>Press ESC to End.</h3>
                     <br></br>
                 </div>
