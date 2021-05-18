@@ -39,11 +39,13 @@ const getSnakeStartValue = board => {
     };
 };
 
-const getDirectionFromKey = key =>
-    key === UP_KEY ? Direction.UP :
-        key === RIGHT_KEY ? Direction.RIGHT :
-            key === DOWN_KEY ? Direction.DOWN :
-                key === LEFT_KEY ? Direction.LEFT : null;
+const getDirectionFromKey = key => {
+    if (key === UP_KEY) return Direction.UP;
+    else if (key === RIGHT_KEY) return Direction.RIGHT;
+    else if (key === DOWN_KEY) return Direction.DOWN;
+    else if (key === LEFT_KEY) return Direction.LEFT
+    else return null;
+}
 
 const createBoard = boardSize => {
     let counter = 1;
@@ -108,10 +110,28 @@ const Board = (props) => {
         return row < 0 || col < 0 || row >= board.length || col >= board[0].length
     }, [board]);
 
-    const getCellClassName = useCallback((cellValue) =>
-        snakeCells.has(cellValue) ? 'cell snake-cell' :
-            cellValue === foodCell ? 'cell food-cell' :
-                'cell', [foodCell, snakeCells]);
+    const getCellClassName = useCallback((cellValue) => {
+        if (snakeCells.has(cellValue)) return 'cell snake-cell';
+        else if (cellValue === foodCell) return 'cell food-cell';
+        else return 'cell';
+    }, [foodCell, snakeCells]);
+
+    const handleDirection = useCallback((newDirection) => {
+        // Ignore the cases
+        // 1. input key not arrow directions, or
+        // 2. the next cell is the same as the cell one after the haed 
+        // when the snake's size is greater than one.
+        if (newDirection === null) return;
+
+        const nextHeadCoords = getNextCoords(newDirection);
+        if (!isOutOfBounds(nextHeadCoords) &&
+            snake.length > 1 &&
+            snake[snake.length - 2].cell === board[nextHeadCoords.row][nextHeadCoords.col]) {
+            return;
+        }
+
+        setDirection(newDirection);
+    }, [board, getNextCoords, isOutOfBounds, snake]);
 
     // Handle keydown event.
     useEffect(() => {
@@ -124,28 +144,13 @@ const Board = (props) => {
             } else if (e.key === END_KEY) {
                 props.viewHandler();
             } else if (!stop) {
-                const newDirection = getDirectionFromKey(e.key);
-                // Ignore the cases
-                // 1. input key not arrow directions, or
-                // 2. the next cell is the same as the cell one after the haed 
-                // when the snake's size is greater than one.
-                if (newDirection === null) return;
-
-                const nextHeadCoords = getNextCoords(newDirection);
-                if (!isOutOfBounds(nextHeadCoords) &&
-                    snake.length > 1 &&
-                    snake[snake.length - 2].cell === board[nextHeadCoords.row][nextHeadCoords.col]) {
-                    return;
-                }
-
-                setDirection(newDirection);
+                handleDirection(getDirectionFromKey(e.key));
             }
         };
 
         window.addEventListener('keydown', handleKeydown);
         return () => window.removeEventListener('keydown', handleKeydown);
-    }, [board, snake, stop, direction, snakeCells.size, isPauseOpen, isEnd,
-        handleRestart, getNextCoords, isOutOfBounds, props]);
+    }, [board, stop, direction, snakeCells.size, isPauseOpen, isEnd, handleRestart, handleDirection, props]);
 
     // Handle scores
     useEffect(() => {
@@ -204,6 +209,10 @@ const Board = (props) => {
         setIsPauseOpen(true);
     }
 
+    const buttonHandler = (dir) => {
+        handleDirection(dir);
+    }
+
     return (
         <>
             <div className="board">{
@@ -225,6 +234,24 @@ const Board = (props) => {
                     <div className="score-cell">
                         <span>Top Score: {props.topScore}</span>
                     </div>
+                </div>
+            </div>
+            <div className="button-container">
+                <div className="button-sub-container">
+                    <button className="button-direction" onClick={() => buttonHandler(Direction.UP)}>
+                        <div className="button-arrow button-up"></div>
+                    </button>
+                </div>
+                <div className="button-sub-container">
+                    <button className="button-direction" onClick={() => buttonHandler(Direction.LEFT)}>
+                        <div className="button-arrow button-left"></div>
+                    </button>
+                    <button className="button-direction" onClick={() => buttonHandler(Direction.DOWN)}>
+                        <div className="button-arrow button-down"></div>
+                    </button>
+                    <button className="button-direction" onClick={() => buttonHandler(Direction.RIGHT)}>
+                        <div className="button-arrow button-right"></div>
+                    </button>
                 </div>
             </div>
             <Modal isOpen={isPauseOpen}>

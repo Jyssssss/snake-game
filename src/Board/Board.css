@@ -31,3 +31,53 @@
     vertical-align: middle;
     width: 50%;
 }
+
+.button-container {
+    margin-top: 25px;
+}
+
+.button-sub-container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.button-direction {
+    background-color: rgba(81, 81, 202, 0.39);
+    height: 50px;
+    width: 50px;
+    margin: 3px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.button-arrow {
+    background-color: transparent;
+    height: 12px;
+    width: 12px;
+}
+
+.button-up {
+    border-left: 5px solid rgba(0, 0, 0, 0.3);
+    border-top: 5px solid rgba(0, 0, 0, 0.3);
+    transform: translateY(25%) rotate(45deg);
+}
+
+.button-left {
+    border-bottom: 5px solid rgba(0, 0, 0, 0.3);
+    border-left: 5px solid rgba(0, 0, 0, 0.3);
+    transform: translateX(25%) rotate(45deg);
+}
+
+.button-right {
+    border-right: 5px solid rgba(0, 0, 0, 0.3);
+    border-top: 5px solid rgba(0, 0, 0, 0.3);
+    transform: translateX(-25%) rotate(45deg);
+}
+
+.button-down {
+    border-bottom: 5px solid rgba(0, 0, 0, 0.3);
+    border-right: 5px solid rgba(0, 0, 0, 0.3);
+    transform: translateY(-25%) rotate(45deg);
+}
