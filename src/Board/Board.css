@@ -9,7 +9,6 @@
 .cell {
     width: 30px;
     height: 30px;
-    outline: 1px solid burlywood;
     display: inline-block;
 }
 
@@ -19,9 +18,11 @@
 
 .food-cell {
     background-color: red;
+    border-radius: 15px;
 }
 
 .score-row {
+    outline: 1px solid burlywood;
     text-align: center;
 }
 
